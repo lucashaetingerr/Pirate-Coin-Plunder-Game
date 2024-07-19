@@ -1,7 +1,7 @@
 import sys
 import os
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                             QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy)
+                             QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect)
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
 
@@ -75,6 +75,19 @@ class BotaoAnimado(QPushButton):
             }
         """)
 
+        # Adicionar sombra ao botão e ao texto do botão
+        sombra = QGraphicsDropShadowEffect()
+        sombra.setBlurRadius(10)
+        sombra.setOffset(2, 2)
+        sombra.setColor(QColor(0, 0, 0, 75))
+        self.setGraphicsEffect(sombra)
+
+        sombra_texto = QGraphicsDropShadowEffect()
+        sombra_texto.setBlurRadius(5)
+        sombra_texto.setOffset(1, 1)
+        sombra_texto.setColor(QColor(0, 0, 0, 75))
+        self.setGraphicsEffect(sombra_texto)
+
     def animar(self):
         # Animação para o botão quando clicado
         animacao = QPropertyAnimation(self, b"geometry")
@@ -120,7 +133,7 @@ class MainWindow(QWidget):
             QScrollBar:vertical {
                 background: transparent;
                 width: 8px;
-                margin-left: 5px;
+                margin-left: 10px;
             }
             QScrollBar:vertical:hover {
                 width: 12px;
@@ -134,10 +147,10 @@ class MainWindow(QWidget):
                 background: none;
             }
             QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-                background: none;
+                background: none.
             }
             QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
+                background: none.
             }
         """)
         conteudo_area_rolagem = QWidget()
@@ -160,13 +173,20 @@ class MainWindow(QWidget):
         self.label_coins.setStyleSheet("""
             QLabel {
                 background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
-                color: black;
+                color: white;
                 padding: 10px;
                 border-radius: 10px;
                 margin-bottom: 20px;
                 border: 1px solid #d9d9d9;
             }
         """)
+
+        # Adicionar sombra ao label "Coins"
+        sombra_coins = QGraphicsDropShadowEffect()
+        sombra_coins.setBlurRadius(10)
+        sombra_coins.setOffset(2, 2)
+        sombra_coins.setColor(QColor(0, 0, 0, 75))
+        self.label_coins.setGraphicsEffect(sombra_coins)
 
         # Botão para incrementar o valor de "Coins"
         self.botao_incrementar = BotaoAnimado("Incrementar Coins")
@@ -186,6 +206,13 @@ class MainWindow(QWidget):
         self.label_autor.setStyleSheet("color: #999; margin-top: 15px; margin-bottom: 7px;")
         layout_vertical_coins.addWidget(self.label_autor, alignment=Qt.AlignBottom)
 
+        # Adicionar sombra ao label "Developed by..."
+        sombra_autor = QGraphicsDropShadowEffect()
+        sombra_autor.setBlurRadius(10)
+        sombra_autor.setOffset(2, 2)
+        sombra_autor.setColor(QColor(0, 0, 0, 75))
+        self.label_autor.setGraphicsEffect(sombra_autor)
+
         # Adicionar widgets ao layout horizontal
         layout_horizontal.addWidget(area_rolagem, 1)
         layout_horizontal.addLayout(layout_vertical_coins, 3)
@@ -196,15 +223,15 @@ class MainWindow(QWidget):
         self.setLayout(layout_principal)
 
         # Botão de configurações
-        botao_configuracoes = QPushButton(self)
-        botao_configuracoes.setIcon(QIcon(os.path.join("resources", "icons", "settings.svg")))  # Ajustar caminho do ícone
-        botao_configuracoes.setIconSize(botao_configuracoes.size())
-        botao_configuracoes.setStyleSheet("border: none;")
-        botao_configuracoes.setFixedSize(30, 30)
-        botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
+        self.botao_configuracoes = QPushButton(self)
+        self.botao_configuracoes.setIcon(QIcon(os.path.join("resources", "icons", "settings.svg")))  # Ajustar caminho do ícone
+        self.botao_configuracoes.setIconSize(self.botao_configuracoes.size())
+        self.botao_configuracoes.setStyleSheet("border: none;")
+        self.botao_configuracoes.setFixedSize(30, 30)
+        self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
 
         # Adicionar botão de configurações ao layout principal
-        layout_principal.addWidget(botao_configuracoes, alignment=Qt.AlignRight)
+        layout_principal.addWidget(self.botao_configuracoes, alignment=Qt.AlignRight)
 
         self.installEventFilter(self)
 
@@ -238,6 +265,7 @@ class MainWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(os.path.join("resources", "icons", "window_game_icon.svg")))  # Definir ícone da barra de tarefas
     janela_principal = MainWindow()
     janela_principal.show()
     sys.exit(app.exec_())
