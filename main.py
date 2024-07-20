@@ -2,8 +2,9 @@ import sys
 import os
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 class ConfigDialog(QDialog):
     def __init__(self):
@@ -60,7 +61,7 @@ class BotaoAnimado(QPushButton):
         self.incremento = incremento
         self.quantidade_comprada = 0
         self.metodo = metodo
-        self.font_bold = QFont('Karla', 16, QFont.Bold)
+        self.font_bold = QFont('Karla-Bold', 16, QFont.Bold)
         self.font_regular = QFont('Karla', 16)
         self.atualizar_texto()
         self.setStyleSheet("""
@@ -148,9 +149,11 @@ class MainWindow(QWidget):
 
         # Carregar fontes Karla
         QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla", "static", "Karla-Regular.ttf"))
-        QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla", "static", "Karla-Bold.ttf"))
+        QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla-Bold", "static", "Karla-Bold.ttf"))
 
         self.setWindowIcon(QIcon(os.path.join("resources", "icons", "window_game_icon.svg")))  # Definir ícone da janela
+        self.sound = True  # Variável de controle para o ícone de som
+        self.audio_players = []  # Lista para gerenciar players de áudio
         self.init_ui()
 
     def init_ui(self):
@@ -168,7 +171,7 @@ class MainWindow(QWidget):
         # Título "Loja"
         self.titulo_loja = QLabel("Loja", self)
         self.titulo_loja.setAlignment(Qt.AlignCenter)
-        self.titulo_loja.setFont(QFont('Karla', 24, QFont.Bold))
+        self.titulo_loja.setFont(QFont('Karla-Bold', 24, QFont.Bold))
         self.titulo_loja.setStyleSheet("""
             QLabel {
                 color: #333;
@@ -254,14 +257,17 @@ class MainWindow(QWidget):
 
         self.label_informacoes = QLabel("Texto", self.frame_informacoes)
         self.label_informacoes.setAlignment(Qt.AlignCenter)
-        self.label_informacoes.setFont(QFont('Karla', 24, QFont.Bold))  # Ajuste o tamanho da fonte aqui
+        self.label_informacoes.setFont(QFont('Karla-Bold', 24, QFont.Bold))  # Ajuste o tamanho da fonte aqui
         layout_frame_informacoes.addWidget(self.label_informacoes)
         layout_jogo.addWidget(self.frame_informacoes)
+
+        # Adicionar um espaçador para alinhar o texto "Texto" com "Loja"
+        layout_jogo.insertSpacerItem(0, QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
         # Label central com o texto "Coins: 0"
         self.label_coins = QLabel("Coins: 0", self)
         self.label_coins.setAlignment(Qt.AlignCenter)
-        self.label_coins.setFont(QFont('Karla', 24, QFont.Bold))
+        self.label_coins.setFont(QFont('Karla-Bold', 24, QFont.Bold))
         self.label_coins.setStyleSheet("""
             QLabel {
                 background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
@@ -290,7 +296,7 @@ class MainWindow(QWidget):
 
         self.label_coins_por_segundo = QLabel("Coins por segundo: 0", self.frame_coins_por_segundo)
         self.label_coins_por_segundo.setAlignment(Qt.AlignCenter)
-        self.label_coins_por_segundo.setFont(QFont('Karla', 18, QFont.Bold))
+        self.label_coins_por_segundo.setFont(QFont('Karla-Bold', 18, QFont.Bold))
         self.label_coins_por_segundo.setStyleSheet("""
             QLabel {
                 background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
@@ -305,10 +311,10 @@ class MainWindow(QWidget):
 
         # Botão para incrementar o valor de "Coins"
         self.botao_incrementar = QPushButton("+1 coin", self)
-        self.botao_incrementar.setFont(QFont('Karla', 16, QFont.Bold))
+        self.botao_incrementar.setFont(QFont('Karla-Bold', 16, QFont.Bold))
         self.botao_incrementar.setStyleSheet("""
             QPushButton {
-                background-color: #4CAF50;
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFFACD, stop:1 #FFD700);
                 color: white;
                 padding: 10px;
                 text-align: center;
@@ -317,10 +323,10 @@ class MainWindow(QWidget):
                 border-radius: 12px;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFF8DC, stop:1 #FFEC8B);
             }
             QPushButton:pressed {
-                background-color: #3e8e41;
+                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFECB3, stop:1 #FFD700);
             }
         """)
         self.botao_incrementar.clicked.connect(self.incrementar_coins)
@@ -331,7 +337,7 @@ class MainWindow(QWidget):
         # Texto discreto abaixo do botão de incrementar
         self.label_autor = QLabel("Developed by @lucashaetingerr", self)
         self.label_autor.setAlignment(Qt.AlignCenter)
-        self.label_autor.setFont(QFont('Karla', 10, QFont.Bold))
+        self.label_autor.setFont(QFont('Karla-Bold', 10, QFont.Bold))
         self.label_autor.setStyleSheet("color: #999; margin-top: 15px; margin-bottom: 7px;")
         layout_jogo.addWidget(self.label_autor, alignment=Qt.AlignBottom)
 
@@ -360,10 +366,19 @@ class MainWindow(QWidget):
         self.botao_configuracoes.setFixedSize(30, 30)
         self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
 
+        # Botão de som
+        self.botao_som = QPushButton(self)
+        self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "sound.svg")))  # Ajustar caminho do ícone
+        self.botao_som.setIconSize(self.botao_som.size())
+        self.botao_som.setStyleSheet("border: none;")
+        self.botao_som.setFixedSize(30, 30)
+        self.botao_som.clicked.connect(self.toggle_som)
+
         # Layout para ícones
         layout_icones = QVBoxLayout()
+        layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignTop)
+        layout_icones.addWidget(self.botao_som, alignment=Qt.AlignTop)
         layout_icones.addStretch()
-        layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignRight)
 
         layout_principal.addLayout(layout_icones, 0)
 
@@ -387,7 +402,7 @@ class MainWindow(QWidget):
     def atualizar_tamanho_fonte(self, size):
         # Atualizar tamanho da fonte com base no tamanho da janela
         tamanho_fonte = max(size.width() // 60, 12)
-        self.label_coins.setFont(QFont('Karla', int(tamanho_fonte * 1.5)))
+        self.label_coins.setFont(QFont('Karla-Bold', int(tamanho_fonte * 1.5), QFont.Bold))
 
     @pyqtSlot(QPushButton)
     def botao_lista_clicado(self, botao):
@@ -409,6 +424,9 @@ class MainWindow(QWidget):
             botao.atualizar_texto()
             # Atualizar estado dos botões
             self.atualizar_estado_botoes()
+            # Tocar som de compra, se o som estiver ativado
+            if self.sound:
+                self.tocar_som('buy')
 
     @pyqtSlot()
     def incrementar_coins(self):
@@ -417,6 +435,9 @@ class MainWindow(QWidget):
         novo_valor = valor_atual + 1
         self.label_coins.setText(f"Coins: {novo_valor}")
         self.atualizar_estado_botoes()
+        # Tocar som de farm, se o som estiver ativado
+        if self.sound:
+            self.tocar_som('farm')
 
     def atualizar_coins(self):
         # Atualizar o valor de coins por segundo
@@ -439,6 +460,28 @@ class MainWindow(QWidget):
         janela_configuracoes = ConfigDialog()
         janela_configuracoes.setWindowModality(Qt.ApplicationModal)
         janela_configuracoes.exec_()
+
+    def toggle_som(self):
+        self.sound = not self.sound
+        if self.sound:
+            self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "sound.svg")))
+        else:
+            self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "no_sound.svg")))
+
+    def tocar_som(self, tipo):
+        player = QMediaPlayer()
+        if tipo == 'farm':
+            player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.join("resources", "sounds", "farm.mp3"))))
+        elif tipo == 'buy':
+            player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.join("resources", "sounds", "buy.mp3"))))
+        player.play()
+        player.mediaStatusChanged.connect(lambda status, p=player: self.limpar_audio_player(status, p))
+        self.audio_players.append(player)
+
+    def limpar_audio_player(self, status, player):
+        if status == QMediaPlayer.EndOfMedia:
+            self.audio_players.remove(player)
+            player.deleteLater()
 
     def metodo_exemplo(self):
         print("Item comprado!")
