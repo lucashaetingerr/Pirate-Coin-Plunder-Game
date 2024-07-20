@@ -60,7 +60,8 @@ class BotaoAnimado(QPushButton):
         self.incremento = incremento
         self.quantidade_comprada = 0
         self.metodo = metodo
-        self.setFont(QFont('Karla', 16))
+        self.font_bold = QFont('Karla', 16, QFont.Bold)
+        self.font_regular = QFont('Karla', 16)
         self.atualizar_texto()
         self.setStyleSheet("""
             QPushButton {
@@ -68,7 +69,6 @@ class BotaoAnimado(QPushButton):
                 color: white;
                 padding: 10px;
                 text-align: center;
-                font-size: 16px;
                 margin: 7px 0;
                 border: 1px solid #d9d9d9;
                 border-radius: 12px;
@@ -81,21 +81,15 @@ class BotaoAnimado(QPushButton):
             }
         """)
 
-        # Adicionar sombra ao botão e ao texto do botão
+        # Adicionar sombra ao botão
         sombra = QGraphicsDropShadowEffect()
         sombra.setBlurRadius(10)
         sombra.setOffset(2, 2)
         sombra.setColor(QColor(0, 0, 0, 75))
         self.setGraphicsEffect(sombra)
 
-        sombra_texto = QGraphicsDropShadowEffect()
-        sombra_texto.setBlurRadius(5)
-        sombra_texto.setOffset(1, 1)
-        sombra_texto.setColor(QColor(0, 0, 0, 75))
-        self.setGraphicsEffect(sombra_texto)
-
     def atualizar_texto(self):
-        self.setText(f"({self.quantidade_comprada})   {self.nome}\nPreço: {self.preco} coins\n +{self.incremento} coin(s)/s")
+        self.setText(f"({self.quantidade_comprada}) {self.nome}\nPreço: {self.preco} coins\n+{self.incremento} coin(s)/s")
 
     def animar(self):
         # Animação para o botão quando clicado
@@ -118,7 +112,6 @@ class BotaoAnimado(QPushButton):
                     color: white;
                     padding: 10px;
                     text-align: center;
-                    font-size: 16px;
                     margin: 7px 0;
                     border: 1px solid #d9d9d9;
                     border-radius: 12px;
@@ -137,7 +130,6 @@ class BotaoAnimado(QPushButton):
                     color: white;
                     padding: 10px;
                     text-align: center;
-                    font-size: 16px;
                     margin: 7px 0;
                     border: 1px solid #d9d9d9;
                     border-radius: 12px;
@@ -241,9 +233,30 @@ class MainWindow(QWidget):
         layout_area_rolagem.addStretch()
         layout_loja.addWidget(area_rolagem)
 
-        # Layout do jogo (direita)
+        # Divisória à direita do layout da loja
+        divisoria_direita_loja = QFrame(self)
+        divisoria_direita_loja.setFrameShape(QFrame.VLine)
+        divisoria_direita_loja.setFrameShadow(QFrame.Sunken)
+        divisoria_direita_loja.setStyleSheet("color: #d9d9d9;")
+        
+        layout_principal.addLayout(layout_loja, 1)
+        layout_principal.addWidget(divisoria_direita_loja)
+
+        # Layout do jogo (centro)
         layout_jogo = QVBoxLayout()
         layout_jogo.setContentsMargins(10, 10, 10, 10)
+
+        # Frame para informações
+        self.frame_informacoes = QFrame(self)
+        self.frame_informacoes.setFrameShape(QFrame.StyledPanel)
+        self.frame_informacoes.setFrameShadow(QFrame.Raised)
+        layout_frame_informacoes = QVBoxLayout(self.frame_informacoes)
+
+        self.label_informacoes = QLabel("Texto", self.frame_informacoes)
+        self.label_informacoes.setAlignment(Qt.AlignCenter)
+        self.label_informacoes.setFont(QFont('Karla', 24, QFont.Bold))  # Ajuste o tamanho da fonte aqui
+        layout_frame_informacoes.addWidget(self.label_informacoes)
+        layout_jogo.addWidget(self.frame_informacoes)
 
         # Label central com o texto "Coins: 0"
         self.label_coins = QLabel("Coins: 0", self)
@@ -291,8 +304,25 @@ class MainWindow(QWidget):
         layout_jogo.addWidget(self.frame_coins_por_segundo)
 
         # Botão para incrementar o valor de "Coins"
-        self.botao_incrementar = BotaoAnimado("Incrementar Coins", 0, 0, self.incrementar_coins)
+        self.botao_incrementar = QPushButton("+1 coin", self)
         self.botao_incrementar.setFont(QFont('Karla', 16, QFont.Bold))
+        self.botao_incrementar.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                margin: 7px 0;
+                border: 1px solid #d9d9d9;
+                border-radius: 12px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3e8e41;
+            }
+        """)
         self.botao_incrementar.clicked.connect(self.incrementar_coins)
         layout_jogo.addWidget(self.botao_incrementar, alignment=Qt.AlignCenter)
 
@@ -312,11 +342,15 @@ class MainWindow(QWidget):
         sombra_autor.setColor(QColor(0, 0, 0, 75))
         self.label_autor.setGraphicsEffect(sombra_autor)
 
-        # Adicionar layouts ao layout principal
-        layout_principal.addLayout(layout_loja, 1)
         layout_principal.addLayout(layout_jogo, 2)
 
-        self.setLayout(layout_principal)
+        # Divisória à esquerda do layout de ícones
+        divisoria_esquerda_icones = QFrame(self)
+        divisoria_esquerda_icones.setFrameShape(QFrame.VLine)
+        divisoria_esquerda_icones.setFrameShadow(QFrame.Sunken)
+        divisoria_esquerda_icones.setStyleSheet("color: #d9d9d9;")
+        
+        layout_principal.addWidget(divisoria_esquerda_icones)
 
         # Botão de configurações
         self.botao_configuracoes = QPushButton(self)
@@ -326,8 +360,14 @@ class MainWindow(QWidget):
         self.botao_configuracoes.setFixedSize(30, 30)
         self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
 
-        # Adicionar botão de configurações ao layout principal
-        layout_principal.addWidget(self.botao_configuracoes, alignment=Qt.AlignRight)
+        # Layout para ícones
+        layout_icones = QVBoxLayout()
+        layout_icones.addStretch()
+        layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignRight)
+
+        layout_principal.addLayout(layout_icones, 0)
+
+        self.setLayout(layout_principal)
 
         self.installEventFilter(self)
 
