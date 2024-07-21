@@ -55,31 +55,34 @@ class ConfigDialog(QDialog):
         self.accept()
 
 class BotaoAnimado(QPushButton):
-    def __init__(self, nome, preco, incremento, metodo, parent=None):
+    def __init__(self, nome, preco, incremento, metodo, icone, parent=None):
         super().__init__(parent)
         self.nome = nome
         self.preco = preco
         self.incremento = incremento
         self.quantidade_comprada = 0
         self.metodo = metodo
+        self.icone = icone
         self.font_bold = QFont('Karla-Bold', 16, QFont.Bold)
         self.font_regular = QFont('Karla', 16)
+        self.setIcon(QIcon(icone))
+        self.setIconSize(QSize(32, 32))
         self.atualizar_texto()
         self.setStyleSheet("""
             QPushButton {
                 background-color: #134B70;
                 color: white;
                 padding: 10px;
-                text-align: center;
+                text-align: left;
                 margin: 7px 0;
                 border: 1px solid #d9d9d9;
                 border-radius: 12px;
             }
             QPushButton:hover {
-                background-color: #134B70;
+                background-color: #508C9B;
             }
             QPushButton:pressed {
-                background-color: #134B70;
+                background-color: #201E43;
             }
         """)
 
@@ -113,7 +116,7 @@ class BotaoAnimado(QPushButton):
                     background-color: #A9A9A9;
                     color: white;
                     padding: 10px;
-                    text-align: center;
+                    text-align: left;
                     margin: 7px 0;
                     border: 1px solid #d9d9d9;
                     border-radius: 12px;
@@ -131,16 +134,16 @@ class BotaoAnimado(QPushButton):
                     background-color: #134B70;
                     color: white;
                     padding: 10px;
-                    text-align: center;
+                    text-align: left;
                     margin: 7px 0;
                     border: 1px solid #d9d9d9;
                     border-radius: 12px;
                 }
                 QPushButton:hover {
-                    background-color: #134B70;
+                    background-color: #508C9B;
                 }
                 QPushButton:pressed {
-                    background-color: #134B70;
+                    background-color: #201E43;
                 }
             """)
 
@@ -152,7 +155,7 @@ class MainWindow(QWidget):
         QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla", "static", "Karla-Regular.ttf"))
         QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla-Bold", "static", "Karla-Bold.ttf"))
 
-        self.setWindowIcon(QIcon(os.path.join("resources", "icons", "window_game_icon.svg")))  # Definir ícone da janela
+        self.setWindowIcon(QIcon(os.path.join("resources", "icons", "coin.svg")))  # Definir ícone da janela
         self.sound = True  # Variável de controle para o ícone de som
         self.audio_players = []  # Lista para gerenciar players de áudio
         self.gift_icon = None  # Variável para armazenar o ícone de presente
@@ -230,22 +233,22 @@ class MainWindow(QWidget):
 
         # Dados dos botões
         self.botoes_dados = [
-            {"nome": "Navio Pirata", "preco": 10, "incremento": 1},
-            {"nome": "Baú de Tesouro", "preco": 25, "incremento": 3},
-            {"nome": "Tripulação de Bucaneiros", "preco": 50, "incremento": 5},
-            {"nome": "Chapéu do Capitão", "preco": 100, "incremento": 10},
-            {"nome": "Papagaio", "preco": 200, "incremento": 20},
-            {"nome": "Canhão", "preco": 400, "incremento": 40},
-            {"nome": "Mapa do Pirata", "preco": 800, "incremento": 80},
-            {"nome": "Sabre", "preco": 1600, "incremento": 160},
-            {"nome": "Pérola Negra", "preco": 3200, "incremento": 320},
-            {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640}
+            {"nome": "Navio Pirata", "preco": 10, "incremento": 1, "icone": os.path.join("resources", "icons", "store_icons", "pirate-ship.svg")},
+            {"nome": "Baú de Tesouro", "preco": 25, "incremento": 3, "icone": os.path.join("resources", "icons", "store_icons", "treasure-chest.svg")},
+            {"nome": "Tripulação de Bucaneiros", "preco": 50, "incremento": 5, "icone": os.path.join("resources", "icons", "store_icons", "pirate-buccaneer.svg")},
+            {"nome": "Chapéu do Capitão", "preco": 100, "incremento": 10, "icone": os.path.join("resources", "icons", "store_icons", "pirate-hat.svg")},
+            {"nome": "Papagaio", "preco": 200, "incremento": 20, "icone": os.path.join("resources", "icons", "store_icons", "parrot.svg")},
+            {"nome": "Canhão", "preco": 400, "incremento": 40, "icone": os.path.join("resources", "icons", "store_icons", "cannon.svg")},
+            {"nome": "Mapa do Pirata", "preco": 800, "incremento": 80, "icone": os.path.join("resources", "icons", "store_icons", "pirate-map.svg")},
+            {"nome": "Sabre", "preco": 1600, "incremento": 160, "icone": os.path.join("resources", "icons", "store_icons", "saber.svg")},
+            {"nome": "Pérola Negra", "preco": 3200, "incremento": 320, "icone": os.path.join("resources", "icons", "store_icons", "pearl.svg")},
+            {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640, "icone": os.path.join("resources", "icons", "store_icons", "legendary-treasure.svg")}
         ]
 
         # Adicionar botões à lista
         self.botoes = []
         for dados in self.botoes_dados:
-            botao = BotaoAnimado(dados['nome'], dados['preco'], dados['incremento'], self.metodo_exemplo)
+            botao = BotaoAnimado(dados['nome'], dados['preco'], dados['incremento'], self.metodo_exemplo, dados['icone'])
             botao.clicked.connect(lambda _, b=botao: self.botao_lista_clicado(b))
             self.botoes.append(botao)
             layout_area_rolagem.addWidget(botao)
@@ -543,7 +546,7 @@ class MainWindow(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(os.path.join("resources", "icons", "window_game_icon.svg")))  # Definir ícone da barra de tarefas
+    app.setWindowIcon(QIcon(os.path.join("resources", "icons", "coin.svg")))  # Definir ícone da barra de tarefas
     janela_principal = MainWindow()
     janela_principal.show()
     sys.exit(app.exec_())

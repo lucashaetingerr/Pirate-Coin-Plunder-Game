@@ -1,60 +1,23 @@
-Temática: Mundo dos Piratas
-Nome do Jogo: "Pirate Coin Plunder"
-Itens da Loja:
-Pirate Ship (Navio Pirata)
+Pirate Coin Plunder
+"Pirate Coin Plunder" é um jogo de coleta de moedas onde você assume o papel de um pirata destemido em busca de riquezas. Navegue pelos mares, recrute uma tripulação leal e colete itens poderosos para aumentar seu saque. Compre itens na loja para aumentar sua taxa de coleta de ouros e torne-se o pirata mais rico de todos os tempos!
 
-Preço: 10 coins
-Incremento: +1 coin/s
-Descrição: "Um navio robusto que aumenta sua capacidade de saque."
-Treasure Chest (Baú de Tesouro)
-
-Preço: 25 coins
-Incremento: +3 coins/s
-Descrição: "Um baú cheio de ouro, aumentando sua riqueza a cada segundo."
-Crew of Buccaneers (Tripulação de Bucaneiros)
-
-Preço: 50 coins
-Incremento: +5 coins/s
-Descrição: "Uma equipe de bucaneiros leais para ajudar em suas aventuras."
-Captain's Hat (Chapéu do Capitão)
-
-Preço: 100 coins
-Incremento: +10 coins/s
-Descrição: "O chapéu distintivo do capitão que inspira sua tripulação a saquear mais rápido."
-Parrot (Papagaio)
-
-Preço: 200 coins
-Incremento: +20 coins/s
-Descrição: "Um papagaio treinado para encontrar tesouros escondidos."
-Cannon (Canhão)
-
-Preço: 400 coins
-Incremento: +40 coins/s
-Descrição: "Um canhão poderoso para proteger seus tesouros e saquear com eficiência."
-Pirate's Map (Mapa do Pirata)
-
-Preço: 800 coins
-Incremento: +80 coins/s
-Descrição: "Um mapa detalhado que revela locais de tesouros ocultos."
-Cutlass (Sabre)
-
-Preço: 1600 coins
-Incremento: +160 coins/s
-Descrição: "Uma espada afiada que garante vitórias rápidas em combates."
-Black Pearl (Pérola Negra)
-
-Preço: 3200 coins
-Incremento: +320 coins/s
-Descrição: "O lendário navio pirata que domina os mares."
-Legendary Treasure (Tesouro Lendário)
-
-Preço: 6400 coins
-Incremento: +640 coins/s
-Descrição: "O maior tesouro de todos os tempos, aumentando sua fortuna exponencialmente."
-Descrição do Jogo:
-Em "Pirate Coin Plunder", você assume o papel de um pirata destemido em busca de riquezas. Navegue pelos mares, recrute uma tripulação leal e colete itens poderosos para aumentar seu saque. Compre itens na loja para aumentar sua taxa de coleta de moedas e torne-se o pirata mais rico de todos os tempos!
-
-Recursos Adicionais:
-Missões Especiais: Realize missões para ganhar recompensas extras.
-Eventos Aleatórios: Eventos aleatórios de tempestades e batalhas navais que podem impactar temporariamente sua coleta de moedas.
-Personalização do Navio: Personalize seu navio com diferentes velas, bandeiras e decorações compradas na loja para bônus visuais e de desempenho.
+Funcionalidades
+Incremento de Moedas: Clique no ícone de moeda para ganhar mais ouros.
+Loja de Itens: Compre itens na loja para aumentar sua taxa de coleta de ouros por segundo.
+Itens Disponíveis na Loja:
+Navio Pirata
+Baú de Tesouro
+Tripulação de Bucaneiros
+Chapéu do Capitão
+Papagaio
+Canhão
+Mapa do Pirata
+Sabre
+Pérola Negra
+Tesouro Lendário
+Sistema de Tempo: Veja o tempo decorrido desde o início do jogo.
+Som: Sons de farm e compra de itens.
+Configurações: Janela de configurações para futuras expansões.
+Tecnologias Utilizadas
+Python 3.x
+PyQt5
