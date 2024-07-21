@@ -1,8 +1,9 @@
 import sys
 import os
+import random
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
@@ -154,7 +155,19 @@ class MainWindow(QWidget):
         self.setWindowIcon(QIcon(os.path.join("resources", "icons", "window_game_icon.svg")))  # Definir ícone da janela
         self.sound = True  # Variável de controle para o ícone de som
         self.audio_players = []  # Lista para gerenciar players de áudio
+        self.gift_icon = None  # Variável para armazenar o ícone de presente
         self.init_ui()
+
+        # Timer para spawnar o ícone de presente
+        self.spawn_timer = QTimer(self)
+        self.spawn_timer.timeout.connect(self.spawn_gift_icon)
+        self.spawn_timer.start(60000)  # 1 minuto
+
+        # Timer para o tempo decorrido
+        self.elapsed_timer = QTimer(self)
+        self.elapsed_timer.timeout.connect(self.update_elapsed_time)
+        self.elapsed_time = QTime(0, 0, 0)  # Inicia o tempo em 0
+        self.elapsed_timer.start(1000)
 
     def init_ui(self):
         self.setWindowTitle("[ALPHA] 1st Game")
@@ -255,19 +268,23 @@ class MainWindow(QWidget):
         self.frame_informacoes.setFrameShadow(QFrame.Raised)
         layout_frame_informacoes = QVBoxLayout(self.frame_informacoes)
 
-        self.label_informacoes = QLabel("Texto", self.frame_informacoes)
-        self.label_informacoes.setAlignment(Qt.AlignCenter)
+        self.label_informacoes = QLabel("Informações", self.frame_informacoes)
+        self.label_informacoes.setAlignment(Qt.AlignTop | Qt.AlignCenter)  # Alinhar ao topo
         self.label_informacoes.setFont(QFont('Karla-Bold', 24, QFont.Bold))  # Ajuste o tamanho da fonte aqui
         layout_frame_informacoes.addWidget(self.label_informacoes)
+        
+        # Label para mostrar o tempo decorrido
+        self.label_tempo = QLabel("Tempo: 00:00:00", self.frame_informacoes)
+        self.label_tempo.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+        self.label_tempo.setFont(QFont('Karla', 16))
+        layout_frame_informacoes.addWidget(self.label_tempo)
+        
         layout_jogo.addWidget(self.frame_informacoes)
-
-        # Adicionar um espaçador para alinhar o texto "Texto" com "Loja"
-        layout_jogo.insertSpacerItem(0, QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
         # Label central com o texto "Coins: 0"
         self.label_coins = QLabel("Coins: 0", self)
-        self.label_coins.setAlignment(Qt.AlignCenter)
-        self.label_coins.setFont(QFont('Karla-Bold', 24, QFont.Bold))
+        self.label_coins.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
+        self.label_coins.setFont(QFont('Karla-Bold', 18, QFont.Bold))
         self.label_coins.setStyleSheet("""
             QLabel {
                 background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
@@ -294,7 +311,7 @@ class MainWindow(QWidget):
         self.frame_coins_por_segundo.setFrameShadow(QFrame.Raised)
         layout_frame_coins = QVBoxLayout(self.frame_coins_por_segundo)
 
-        self.label_coins_por_segundo = QLabel("Coins por segundo: 0", self.frame_coins_por_segundo)
+        self.label_coins_por_segundo = QLabel("Rendimento: 0 coins/s", self.frame_coins_por_segundo)
         self.label_coins_por_segundo.setAlignment(Qt.AlignCenter)
         self.label_coins_por_segundo.setFont(QFont('Karla-Bold', 18, QFont.Bold))
         self.label_coins_por_segundo.setStyleSheet("""
@@ -306,29 +323,22 @@ class MainWindow(QWidget):
                 border: 1px solid #d9d9d9;
             }
         """)
+        
+        # Adicionar sombra ao frame "Rendimento"
+        sombra_rendimento = QGraphicsDropShadowEffect()
+        sombra_rendimento.setBlurRadius(10)
+        sombra_rendimento.setOffset(2, 2)
+        sombra_rendimento.setColor(QColor(0, 0, 0, 75))
+        self.frame_coins_por_segundo.setGraphicsEffect(sombra_rendimento)
+
         layout_frame_coins.addWidget(self.label_coins_por_segundo)
         layout_jogo.addWidget(self.frame_coins_por_segundo)
 
-        # Botão para incrementar o valor de "Coins"
-        self.botao_incrementar = QPushButton("+1 coin", self)
-        self.botao_incrementar.setFont(QFont('Karla-Bold', 16, QFont.Bold))
-        self.botao_incrementar.setStyleSheet("""
-            QPushButton {
-                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFFACD, stop:1 #FFD700);
-                color: white;
-                padding: 10px;
-                text-align: center;
-                margin: 7px 0;
-                border: 1px solid #d9d9d9;
-                border-radius: 12px;
-            }
-            QPushButton:hover {
-                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFF8DC, stop:1 #FFEC8B);
-            }
-            QPushButton:pressed {
-                background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #FFECB3, stop:1 #FFD700);
-            }
-        """)
+        # Botão para incrementar o valor de "Coins" com ícone de moeda
+        self.botao_incrementar = QPushButton(self)
+        self.botao_incrementar.setIcon(QIcon(os.path.join("resources", "icons", "coin.svg")))
+        self.botao_incrementar.setIconSize(QSize(80, 80))  # Aumentar o tamanho do ícone
+        self.botao_incrementar.setStyleSheet("border: none; background: transparent;")
         self.botao_incrementar.clicked.connect(self.incrementar_coins)
         layout_jogo.addWidget(self.botao_incrementar, alignment=Qt.AlignCenter)
 
@@ -416,7 +426,7 @@ class MainWindow(QWidget):
             botao.metodo()
             # Incrementar o valor dos coins por segundo
             self.coins_por_segundo += botao.incremento
-            self.label_coins_por_segundo.setText(f"Coins por segundo: {self.coins_por_segundo}")
+            self.label_coins_por_segundo.setText(f"Rendimento: {self.coins_por_segundo} coins/s")
             # Incrementar a quantidade comprada
             botao.quantidade_comprada += 1
             # Aumentar o preço do item
@@ -485,6 +495,46 @@ class MainWindow(QWidget):
 
     def metodo_exemplo(self):
         print("Item comprado!")
+
+    def spawn_gift_icon(self):
+        if self.gift_icon is not None:
+            return  # Já existe um gift na tela
+
+        self.gift_icon = QPushButton(self)
+        self.gift_icon.setIcon(QIcon(os.path.join("resources", "icons", "gift.svg")))
+        self.gift_icon.setIconSize(self.gift_icon.size())
+        self.gift_icon.setStyleSheet("border: none; background: transparent;")
+        self.gift_icon.setFixedSize(64, 64)
+
+        x = random.randint(0, self.width() - self.gift_icon.width())
+        y = random.randint(0, self.height() - self.gift_icon.height())
+        self.gift_icon.move(x, y)
+        self.gift_icon.show()
+        self.gift_icon.clicked.connect(self.collect_gift)
+
+        # Timer para remover o ícone após 4 segundos
+        QTimer.singleShot(4000, self.remove_gift_icon)
+
+    def remove_gift_icon(self):
+        if self.gift_icon is not None:
+            self.gift_icon.deleteLater()
+            self.gift_icon = None
+
+    def collect_gift(self):
+        valor_atual = int(self.label_coins.text().split(": ")[1])
+        novo_valor = int(valor_atual * 1.20)
+        if valor_atual == 0:
+            novo_valor = 100  # Adiciona 100 coins se o valor atual for zero
+        self.label_coins.setText(f"Coins: {novo_valor}")
+        self.atualizar_estado_botoes()
+        self.remove_gift_icon()
+        # Tocar som de farm, se o som estiver ativado
+        if self.sound:
+            self.tocar_som('farm')
+
+    def update_elapsed_time(self):
+        self.elapsed_time = self.elapsed_time.addSecs(1)
+        self.label_tempo.setText(f"Tempo: {self.elapsed_time.toString('hh:mm:ss')}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
