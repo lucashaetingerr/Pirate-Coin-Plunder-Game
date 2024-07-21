@@ -67,7 +67,7 @@ class BotaoAnimado(QPushButton):
         self.atualizar_texto()
         self.setStyleSheet("""
             QPushButton {
-                background-color: #4CAF50;
+                background-color: #134B70;
                 color: white;
                 padding: 10px;
                 text-align: center;
@@ -76,10 +76,10 @@ class BotaoAnimado(QPushButton):
                 border-radius: 12px;
             }
             QPushButton:hover {
-                background-color: #45a049;
+                background-color: #134B70;
             }
             QPushButton:pressed {
-                background-color: #3e8e41;
+                background-color: #134B70;
             }
         """)
 
@@ -91,7 +91,7 @@ class BotaoAnimado(QPushButton):
         self.setGraphicsEffect(sombra)
 
     def atualizar_texto(self):
-        self.setText(f"({self.quantidade_comprada}) {self.nome}\nPreço: {self.preco} coins\n+{self.incremento} coin(s)/s")
+        self.setText(f"({self.quantidade_comprada}) {self.nome}\nPreço: {self.preco} ouros\n+{self.incremento} ouro(s)/s")
 
     def animar(self):
         # Animação para o botão quando clicado
@@ -128,7 +128,7 @@ class BotaoAnimado(QPushButton):
         else:
             self.setStyleSheet("""
                 QPushButton {
-                    background-color: #4CAF50;
+                    background-color: #134B70;
                     color: white;
                     padding: 10px;
                     text-align: center;
@@ -137,10 +137,10 @@ class BotaoAnimado(QPushButton):
                     border-radius: 12px;
                 }
                 QPushButton:hover {
-                    background-color: #45a049;
+                    background-color: #134B70;
                 }
                 QPushButton:pressed {
-                    background-color: #3e8e41;
+                    background-color: #134B70;
                 }
             """)
 
@@ -170,7 +170,7 @@ class MainWindow(QWidget):
         self.elapsed_timer.start(1000)
 
     def init_ui(self):
-        self.setWindowTitle("[ALPHA] 1st Game")
+        self.setWindowTitle("Pirate Coin Plunder")
         self.setGeometry(100, 100, 800, 600)
         self.setMinimumSize(800, 600)
 
@@ -187,7 +187,7 @@ class MainWindow(QWidget):
         self.titulo_loja.setFont(QFont('Karla-Bold', 24, QFont.Bold))
         self.titulo_loja.setStyleSheet("""
             QLabel {
-                color: #333;
+                color: black;
                 margin-bottom: 10px;
             }
         """)
@@ -209,7 +209,7 @@ class MainWindow(QWidget):
                 width: 12px;
             }
             QScrollBar::handle:vertical {
-                background: #4CAF50;
+                background: #134B70;
                 border-radius: 6px;
             }
             QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
@@ -230,12 +230,16 @@ class MainWindow(QWidget):
 
         # Dados dos botões
         self.botoes_dados = [
-            {"nome": "Item 1", "preco": 5, "incremento": 1},
-            {"nome": "Item 2", "preco": 10, "incremento": 2},
-            {"nome": "Item 3", "preco": 20, "incremento": 3},
-            {"nome": "Item 4", "preco": 40, "incremento": 4},
-            {"nome": "Item 5", "preco": 80, "incremento": 5},
-            # Adicione mais itens conforme necessário
+            {"nome": "Navio Pirata", "preco": 10, "incremento": 1},
+            {"nome": "Baú de Tesouro", "preco": 25, "incremento": 3},
+            {"nome": "Tripulação de Bucaneiros", "preco": 50, "incremento": 5},
+            {"nome": "Chapéu do Capitão", "preco": 100, "incremento": 10},
+            {"nome": "Papagaio", "preco": 200, "incremento": 20},
+            {"nome": "Canhão", "preco": 400, "incremento": 40},
+            {"nome": "Mapa do Pirata", "preco": 800, "incremento": 80},
+            {"nome": "Sabre", "preco": 1600, "incremento": 160},
+            {"nome": "Pérola Negra", "preco": 3200, "incremento": 320},
+            {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640}
         ]
 
         # Adicionar botões à lista
@@ -271,23 +275,24 @@ class MainWindow(QWidget):
         self.label_informacoes = QLabel("Informações", self.frame_informacoes)
         self.label_informacoes.setAlignment(Qt.AlignTop | Qt.AlignCenter)  # Alinhar ao topo
         self.label_informacoes.setFont(QFont('Karla-Bold', 24, QFont.Bold))  # Ajuste o tamanho da fonte aqui
+        self.label_informacoes.setStyleSheet("color: black;")
         layout_frame_informacoes.addWidget(self.label_informacoes)
         
         # Label para mostrar o tempo decorrido
         self.label_tempo = QLabel("Tempo: 00:00:00", self.frame_informacoes)
         self.label_tempo.setAlignment(Qt.AlignTop | Qt.AlignCenter)
         self.label_tempo.setFont(QFont('Karla', 16))
+        self.label_tempo.setStyleSheet("color: black;")
         layout_frame_informacoes.addWidget(self.label_tempo)
         
         layout_jogo.addWidget(self.frame_informacoes)
 
-        # Label central com o texto "Coins: 0"
-        self.label_coins = QLabel("Coins: 0", self)
-        self.label_coins.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
-        self.label_coins.setFont(QFont('Karla-Bold', 18, QFont.Bold))
-        self.label_coins.setStyleSheet("""
+        self.label_ouros = QLabel("Ouro atual: 0", self)
+        self.label_ouros.setAlignment(Qt.AlignCenter | Qt.AlignHCenter)
+        self.label_ouros.setFont(QFont('Karla-Bold', 18, QFont.Bold))
+        self.label_ouros.setStyleSheet("""
             QLabel {
-                background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
+                background: #134B70;
                 color: white;
                 padding: 10px;
                 border-radius: 10px;
@@ -296,27 +301,27 @@ class MainWindow(QWidget):
             }
         """)
 
-        # Adicionar sombra ao label "Coins"
-        sombra_coins = QGraphicsDropShadowEffect()
-        sombra_coins.setBlurRadius(10)
-        sombra_coins.setOffset(2, 2)
-        sombra_coins.setColor(QColor(0, 0, 0, 75))
-        self.label_coins.setGraphicsEffect(sombra_coins)
+        # Adicionar sombra ao label "ouros"
+        sombra_ouros = QGraphicsDropShadowEffect()
+        sombra_ouros.setBlurRadius(10)
+        sombra_ouros.setOffset(2, 2)
+        sombra_ouros.setColor(QColor(0, 0, 0, 75))
+        self.label_ouros.setGraphicsEffect(sombra_ouros)
 
-        layout_jogo.addWidget(self.label_coins)
+        layout_jogo.addWidget(self.label_ouros)
 
-        # Frame para coins por segundo
-        self.frame_coins_por_segundo = QFrame(self)
-        self.frame_coins_por_segundo.setFrameShape(QFrame.StyledPanel)
-        self.frame_coins_por_segundo.setFrameShadow(QFrame.Raised)
-        layout_frame_coins = QVBoxLayout(self.frame_coins_por_segundo)
+        # Frame para ouros por segundo
+        self.frame_ouros_por_segundo = QFrame(self)
+        self.frame_ouros_por_segundo.setFrameShape(QFrame.StyledPanel)
+        self.frame_ouros_por_segundo.setFrameShadow(QFrame.Raised)
+        layout_frame_ouros = QVBoxLayout(self.frame_ouros_por_segundo)
 
-        self.label_coins_por_segundo = QLabel("Rendimento: 0 coins/s", self.frame_coins_por_segundo)
-        self.label_coins_por_segundo.setAlignment(Qt.AlignCenter)
-        self.label_coins_por_segundo.setFont(QFont('Karla-Bold', 18, QFont.Bold))
-        self.label_coins_por_segundo.setStyleSheet("""
+        self.label_ouros_por_segundo = QLabel("Rendimento: 0 ouro/s", self.frame_ouros_por_segundo)
+        self.label_ouros_por_segundo.setAlignment(Qt.AlignCenter)
+        self.label_ouros_por_segundo.setFont(QFont('Karla-Bold', 18, QFont.Bold))
+        self.label_ouros_por_segundo.setStyleSheet("""
             QLabel {
-                background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 #56ab2f, stop:1 #a8e063);
+                background: #134B70;
                 color: white;
                 padding: 10px;
                 border-radius: 10px;
@@ -329,17 +334,17 @@ class MainWindow(QWidget):
         sombra_rendimento.setBlurRadius(10)
         sombra_rendimento.setOffset(2, 2)
         sombra_rendimento.setColor(QColor(0, 0, 0, 75))
-        self.frame_coins_por_segundo.setGraphicsEffect(sombra_rendimento)
+        self.frame_ouros_por_segundo.setGraphicsEffect(sombra_rendimento)
 
-        layout_frame_coins.addWidget(self.label_coins_por_segundo)
-        layout_jogo.addWidget(self.frame_coins_por_segundo)
+        layout_frame_ouros.addWidget(self.label_ouros_por_segundo)
+        layout_jogo.addWidget(self.frame_ouros_por_segundo)
 
-        # Botão para incrementar o valor de "Coins" com ícone de moeda
+        # Botão para incrementar o valor de "ouros" com ícone de moeda
         self.botao_incrementar = QPushButton(self)
         self.botao_incrementar.setIcon(QIcon(os.path.join("resources", "icons", "coin.svg")))
         self.botao_incrementar.setIconSize(QSize(80, 80))  # Aumentar o tamanho do ícone
         self.botao_incrementar.setStyleSheet("border: none; background: transparent;")
-        self.botao_incrementar.clicked.connect(self.incrementar_coins)
+        self.botao_incrementar.clicked.connect(self.incrementar_ouros)
         layout_jogo.addWidget(self.botao_incrementar, alignment=Qt.AlignCenter)
 
         layout_jogo.addStretch()  # Adiciona espaço flexível para empurrar o texto do autor para baixo
@@ -396,13 +401,13 @@ class MainWindow(QWidget):
 
         self.installEventFilter(self)
 
-        # Timer para atualizar os coins periodicamente
+        # Timer para atualizar os ouros periodicamente
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.atualizar_coins)
+        self.timer.timeout.connect(self.atualizar_ouros)
         self.timer.start(1000)
 
-        # Variável para armazenar a quantidade de coins por segundo
-        self.coins_por_segundo = 0
+        # Variável para armazenar a quantidade de ouros por segundo
+        self.ouros_por_segundo = 0
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Resize:
@@ -412,25 +417,25 @@ class MainWindow(QWidget):
     def atualizar_tamanho_fonte(self, size):
         # Atualizar tamanho da fonte com base no tamanho da janela
         tamanho_fonte = max(size.width() // 60, 12)
-        self.label_coins.setFont(QFont('Karla-Bold', int(tamanho_fonte * 1.5), QFont.Bold))
+        self.label_ouros.setFont(QFont('Karla-Bold', int(tamanho_fonte * 1.5), QFont.Bold))
 
     @pyqtSlot(QPushButton)
     def botao_lista_clicado(self, botao):
         # Animação e lógica para o botão da lista quando clicado
         botao.animar()
-        # Lógica para comprar o item se tiver coins suficientes
-        valor_atual = int(self.label_coins.text().split(": ")[1])
+        # Lógica para comprar o item se tiver ouros suficientes
+        valor_atual = int(self.label_ouros.text().split(": ")[1])
         if valor_atual >= botao.preco:
             valor_atual -= botao.preco
-            self.label_coins.setText(f"Coins: {valor_atual}")
+            self.label_ouros.setText(f"Ouro atual: {valor_atual}")
             botao.metodo()
-            # Incrementar o valor dos coins por segundo
-            self.coins_por_segundo += botao.incremento
-            self.label_coins_por_segundo.setText(f"Rendimento: {self.coins_por_segundo} coins/s")
+            # Incrementar o valor dos ouros por segundo
+            self.ouros_por_segundo += botao.incremento
+            self.label_ouros_por_segundo.setText(f"Rendimento: {self.ouros_por_segundo} ouro/s")
             # Incrementar a quantidade comprada
             botao.quantidade_comprada += 1
             # Aumentar o preço do item
-            botao.preco += 1
+            botao.preco += botao.preco // 2  # Aumentar o preço em 50%
             botao.atualizar_texto()
             # Atualizar estado dos botões
             self.atualizar_estado_botoes()
@@ -439,26 +444,26 @@ class MainWindow(QWidget):
                 self.tocar_som('buy')
 
     @pyqtSlot()
-    def incrementar_coins(self):
-        # Incrementar o valor de "Coins"
-        valor_atual = int(self.label_coins.text().split(": ")[1])
+    def incrementar_ouros(self):
+        # Incrementar o valor de "ouros"
+        valor_atual = int(self.label_ouros.text().split(": ")[1])
         novo_valor = valor_atual + 1
-        self.label_coins.setText(f"Coins: {novo_valor}")
+        self.label_ouros.setText(f"Ouro atual: {novo_valor}")
         self.atualizar_estado_botoes()
         # Tocar som de farm, se o som estiver ativado
         if self.sound:
             self.tocar_som('farm')
 
-    def atualizar_coins(self):
-        # Atualizar o valor de coins por segundo
-        valor_atual = int(self.label_coins.text().split(": ")[1])
-        novo_valor = valor_atual + self.coins_por_segundo
-        self.label_coins.setText(f"Coins: {novo_valor}")
+    def atualizar_ouros(self):
+        # Atualizar o valor de ouros por segundo
+        valor_atual = int(self.label_ouros.text().split(": ")[1])
+        novo_valor = valor_atual + self.ouros_por_segundo
+        self.label_ouros.setText(f"Ouro atual: {novo_valor}")
         self.atualizar_estado_botoes()
 
     def atualizar_estado_botoes(self):
-        # Atualizar o estado dos botões com base na quantidade de coins
-        valor_atual = int(self.label_coins.text().split(": ")[1])
+        # Atualizar o estado dos botões com base na quantidade de ouros
+        valor_atual = int(self.label_ouros.text().split(": ")[1])
         for botao in self.botoes:
             if valor_atual >= botao.preco:
                 botao.set_bloqueado(False)
@@ -521,11 +526,11 @@ class MainWindow(QWidget):
             self.gift_icon = None
 
     def collect_gift(self):
-        valor_atual = int(self.label_coins.text().split(": ")[1])
+        valor_atual = int(self.label_ouros.text().split(": ")[1])
         novo_valor = int(valor_atual * 1.20)
         if valor_atual == 0:
-            novo_valor = 100  # Adiciona 100 coins se o valor atual for zero
-        self.label_coins.setText(f"Coins: {novo_valor}")
+            novo_valor = 100  # Adiciona 100 ouros se o valor atual for zero
+        self.label_ouros.setText(f"Ouro atual: {novo_valor}")
         self.atualizar_estado_botoes()
         self.remove_gift_icon()
         # Tocar som de farm, se o som estiver ativado
