@@ -4,7 +4,7 @@ import random
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton, QGraphicsDropShadowEffect, QMessageBox, QDialogButtonBox, QDialog, QHBoxLayout, QScrollArea, QFrame)
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QTime, QUrl
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor, QScreen
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent, QMediaPlaylist
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtWidgets import QApplication
 
 from py_files.shop import Shop
@@ -26,24 +26,10 @@ class MainWindow(QWidget):
 
         self.info_panel = InfoPanel(self)
 
-        # Música de fundo
-        playlist = QMediaPlaylist()
-        playlist.addMedia(QMediaContent(QUrl.fromLocalFile(os.path.join("resources", "songs", "background_music.mp3"))))
-        playlist.setPlaybackMode(QMediaPlaylist.Loop)
-
-        self.music_player = QMediaPlayer()
-        self.music_player.setPlaylist(playlist)
-        self.music_player.setVolume(30)
-
-        # Tentar tocar a música, tratar falhas silenciosamente
-        try:
-            self.music_player.play()
-        except Exception as e:
-            print(f"Erro ao tentar tocar música de fundo: {e}")
-        self.music_on = True
-
-        # Tempo decorrido
+        # Inicializar o tempo decorrido
         self.elapsed_time = QTime(0, 0, 0)
+        self.session_start_time = QTime.currentTime()  # Guardar o tempo de início da sessão
+
         self.elapsed_timer = QTimer(self)
         self.elapsed_timer.timeout.connect(self.update_elapsed_time)
         self.elapsed_timer.start(1000)
@@ -52,15 +38,6 @@ class MainWindow(QWidget):
 
         # Carregar progresso do jogo
         self.load_game_data()
-
-        # Sincronizar o tempo decorrido
-        if hasattr(self, 'game_data') and self.game_data.tempo_decorrido:
-            self.elapsed_time = QTime(0, 0, 0).addSecs(self.game_data.tempo_decorrido)
-        self.update_elapsed_time()  # Atualizar a exibição com o tempo carregado
-
-        self.spawn_timer = QTimer(self)
-        self.spawn_timer.timeout.connect(self.spawn_gift_icon)
-        self.spawn_timer.start(60000)
 
     def init_ui(self):
         self.setWindowTitle("[ALPHA] Pirate Coin Plunder")
@@ -97,14 +74,6 @@ class MainWindow(QWidget):
         self.botao_som.setFixedSize(30, 30)
         self.botao_som.clicked.connect(self.toggle_som)
 
-        # Botão de controle de música
-        self.botao_musica = QPushButton(self)
-        self.botao_musica.setIcon(QIcon(os.path.join("resources", "icons", "music_on_icon.svg")))
-        self.botao_musica.setIconSize(self.botao_musica.size())
-        self.botao_musica.setStyleSheet("border: none;")
-        self.botao_musica.setFixedSize(30, 30)
-        self.botao_musica.clicked.connect(self.toggle_music)
-
         # Botão de salvar jogo
         self.botao_salvar = QPushButton(self)
         self.botao_salvar.setIcon(QIcon(os.path.join("resources", "icons", "savegame_icon.svg")))
@@ -115,7 +84,6 @@ class MainWindow(QWidget):
 
         layout_icones = QVBoxLayout()
         layout_icones.addWidget(self.botao_som, alignment=Qt.AlignTop)
-        layout_icones.addWidget(self.botao_musica, alignment=Qt.AlignTop)
         layout_icones.addWidget(self.botao_salvar, alignment=Qt.AlignTop)
         layout_icones.addStretch()
 
@@ -130,6 +98,54 @@ class MainWindow(QWidget):
         self.timer.start(1000)
 
         self.ouros_por_segundo = 0
+
+    def load_game_data(self):
+        self.game_data = GameData()
+        self.game_data.load('game_save.json')
+        self.info_panel.label_ouros.setText(f"Ouro atual: {self.game_data.ouro}")
+        self.ouros_por_segundo = self.game_data.ouros_por_segundo
+        self.info_panel.label_ouros_por_segundo.setText(f"Rendimento: {self.ouros_por_segundo} ouro/s")
+        for botao in self.shop.botoes:
+            botao.quantidade_comprada = self.game_data.items.get(botao.nome, 0)
+            botao.atualizar_texto()
+        self.shop.atualizar_estado_botoes()
+
+        # Carregar e ajustar o tempo decorrido com base no valor salvo
+        self.elapsed_time = QTime(0, 0, 0).addSecs(self.game_data.tempo_decorrido)
+
+        # Reiniciar o temporizador para contar a partir do tempo salvo
+        self.elapsed_timer.stop()
+        self.elapsed_timer.start(1000)
+
+    def update_elapsed_time(self):
+        # Calcular o tempo decorrido desde o início da sessão
+        session_elapsed_seconds = self.session_start_time.secsTo(QTime.currentTime())
+
+        # Tempo decorrido total é o tempo salvo mais o tempo da sessão atual
+        total_elapsed_seconds = self.game_data.tempo_decorrido + session_elapsed_seconds
+
+        # Atualizar o tempo de sessão e o tempo total
+        self.info_panel.label_session_time.setText(f"Tempo da Sessão: {QTime(0, 0, 0).addSecs(session_elapsed_seconds).toString('hh:mm:ss')}")
+        self.info_panel.label_total_time.setText(f"Tempo Total: {QTime(0, 0, 0).addSecs(total_elapsed_seconds).toString('hh:mm:ss')}")
+
+    def salvar_progresso(self):
+        game_data = GameData()
+        game_data.ouro = int(self.info_panel.label_ouros.text().split(": ")[1])
+        game_data.ouros_por_segundo = self.ouros_por_segundo
+        game_data.items = {botao.nome: botao.quantidade_comprada for botao in self.shop.botoes}
+
+        # Calcular o tempo decorrido total para salvar
+        session_elapsed_seconds = self.session_start_time.secsTo(QTime.currentTime())
+        game_data.tempo_decorrido = self.game_data.tempo_decorrido + session_elapsed_seconds
+        game_data.save('game_save.json')
+
+        # Mostrar mensagem de confirmação de salvamento
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Jogo Salvo")
+        msg_box.setText("Seu progresso foi salvo com sucesso.")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec_()
 
     def center_window(self):
         screen = QScreen.availableGeometry(QApplication.primaryScreen())
@@ -161,15 +177,6 @@ class MainWindow(QWidget):
             self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "sound.svg")))
         else:
             self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "no_sound.svg")))
-
-    def toggle_music(self):
-        if self.music_on:
-            self.music_player.pause()
-            self.botao_musica.setIcon(QIcon(os.path.join("resources", "icons", "music_off_icon.svg")))
-        else:
-            self.music_player.play()
-            self.botao_musica.setIcon(QIcon(os.path.join("resources", "icons", "music_on_icon.svg")))
-        self.music_on = not self.music_on
 
     def tocar_som(self, tipo):
         player = QMediaPlayer()
@@ -222,39 +229,6 @@ class MainWindow(QWidget):
         self.remove_gift_icon()
         if self.sound:
             self.tocar_som('farm')
-
-    def update_elapsed_time(self):
-        self.elapsed_time = self.elapsed_time.addSecs(1)
-        self.info_panel.label_tempo.setText(f"Tempo: {self.elapsed_time.toString('hh:mm:ss')}")
-
-    def salvar_progresso(self):
-        game_data = GameData()
-        game_data.ouro = int(self.info_panel.label_ouros.text().split(": ")[1])
-        game_data.ouros_por_segundo = self.ouros_por_segundo
-        game_data.items = {botao.nome: botao.quantidade_comprada for botao in self.shop.botoes}
-        game_data.tempo_decorrido = QTime(0, 0, 0).secsTo(self.elapsed_time)
-        game_data.save('game_save.json')
-
-        # Mostrar mensagem de confirmação de salvamento
-        msg_box = QMessageBox(self)
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Jogo Salvo")
-        msg_box.setText("Seu progresso foi salvo com sucesso.")
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.exec_()
-
-    def load_game_data(self):
-        self.game_data = GameData()
-        self.game_data.load('game_save.json')
-        self.info_panel.label_ouros.setText(f"Ouro atual: {self.game_data.ouro}")
-        self.ouros_por_segundo = self.game_data.ouros_por_segundo
-        self.info_panel.label_ouros_por_segundo.setText(f"Rendimento: {self.ouros_por_segundo} ouro/s")
-        for botao in self.shop.botoes:
-            botao.quantidade_comprada = self.game_data.items.get(botao.nome, 0)
-            botao.atualizar_texto()
-        self.shop.atualizar_estado_botoes()
-        self.elapsed_time = QTime(0, 0, 0).addSecs(self.game_data.tempo_decorrido)
-        self.update_elapsed_time()
 
     def closeEvent(self, event):
         # Diálogo de confirmação ao tentar fechar a janela
