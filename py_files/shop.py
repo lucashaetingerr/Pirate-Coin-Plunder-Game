@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QL
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 class BotaoAnimado(QPushButton):
     def __init__(self, nome, preco, incremento, metodo, icone, parent=None):
@@ -16,8 +15,7 @@ class BotaoAnimado(QPushButton):
         self.quantidade_comprada = 0
         self.metodo = metodo
         self.icone = icone
-        self.font_bold = QFont('Karla-Bold', 16, QFont.Bold)
-        self.font_regular = QFont('Karla', 16)
+        self.font_bold = QFont('Karla-Bold', 12, QFont.Bold)  # Ajuste do tamanho da fonte para 12
         self.setIcon(QIcon(icone))
         self.setIconSize(QSize(32, 32))
         self.atualizar_texto()
@@ -47,6 +45,7 @@ class BotaoAnimado(QPushButton):
         self.setGraphicsEffect(sombra)
 
     def atualizar_texto(self):
+        self.setFont(self.font_bold)  # Define a fonte como Karla-Bold com tamanho ajustado
         self.setText(f"({self.quantidade_comprada}) {self.nome}\nPreço: {self.preco} ouros\n+{self.incremento} ouro(s)/s")
 
     def animar(self):
@@ -132,6 +131,7 @@ class Shop(QWidget):
         # Área de rolagem para a lista de botões
         area_rolagem = QScrollArea(self)
         area_rolagem.setWidgetResizable(True)
+        area_rolagem.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)  # Garantir que a barra de rolagem vertical esteja sempre visível
         area_rolagem.setStyleSheet("""
             QScrollArea {
                 border: none;
@@ -159,8 +159,9 @@ class Shop(QWidget):
                 background: none.
             }
         """)
+
+        # Widget de conteúdo para a área de rolagem
         conteudo_area_rolagem = QWidget()
-        area_rolagem.setWidget(conteudo_area_rolagem)
         layout_area_rolagem = QVBoxLayout(conteudo_area_rolagem)
         layout_area_rolagem.setContentsMargins(0, 0, 0, 0)
 
@@ -187,7 +188,11 @@ class Shop(QWidget):
             layout_area_rolagem.addWidget(botao)
 
         layout_area_rolagem.addStretch()
+        area_rolagem.setWidget(conteudo_area_rolagem)
         layout_loja.addWidget(area_rolagem)
+
+        # Atualizar estado dos botões ao iniciar
+        self.atualizar_estado_botoes()
 
     @pyqtSlot(QPushButton)
     def botao_lista_clicado(self, botao):
