@@ -24,7 +24,6 @@ class MainWindow(QWidget):
         self.gift_icon = None
 
         self.info_panel = InfoPanel(self)
-        self.shop = Shop(self.metodo_exemplo, self)
 
         self.init_ui()
 
@@ -43,7 +42,13 @@ class MainWindow(QWidget):
 
         layout_principal = QHBoxLayout(self)
 
-        layout_principal.addWidget(self.shop, 1)
+        # Criação da área de rolagem para a loja
+        scroll_area_shop = QScrollArea(self)
+        scroll_area_shop.setWidgetResizable(True)
+        scroll_area_shop.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.shop = Shop(self, self.metodo_exemplo)
+        scroll_area_shop.setWidget(self.shop)
+        layout_principal.addWidget(scroll_area_shop, 1)
 
         divisoria_direita_loja = QFrame(self)
         divisoria_direita_loja.setFrameShape(QFrame.VLine)
