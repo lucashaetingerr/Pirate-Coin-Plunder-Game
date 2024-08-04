@@ -3,7 +3,7 @@ import os
 import random
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize, QElapsedTimer
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
@@ -11,12 +11,13 @@ from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 class InfoPanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.elapsed_time = QTime(0, 0, 0)
+        self.elapsed_timer = QElapsedTimer()
+        self.elapsed_timer.start()
         self.init_ui()
 
-        self.elapsed_timer = QTimer(self)
-        self.elapsed_timer.timeout.connect(self.update_elapsed_time)
-        self.elapsed_timer.start(1000)
+        self.update_timer = QTimer(self)
+        self.update_timer.timeout.connect(self.update_elapsed_time)
+        self.update_timer.start(1000)
 
     def init_ui(self):
         layout_jogo = QVBoxLayout(self)
@@ -112,8 +113,9 @@ class InfoPanel(QWidget):
         self.label_autor.setGraphicsEffect(sombra_autor)
 
     def update_elapsed_time(self):
-        self.elapsed_time = self.elapsed_time.addSecs(1)
-        self.label_tempo.setText(f"Tempo: {self.elapsed_time.toString('hh:mm:ss')}")
+        elapsed_msec = self.elapsed_timer.elapsed()
+        elapsed_sec = elapsed_msec // 1000
+        self.label_tempo.setText(f"Tempo: {QTime(0, 0, 0).addSecs(elapsed_sec).toString('hh:mm:ss')}")
 
     @pyqtSlot()
     def incrementar_ouros(self):
