@@ -1,11 +1,9 @@
 import sys
 import os
 import random
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                             QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton, QGraphicsDropShadowEffect)
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEasingCurve, pyqtSlot, QSize
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 class BotaoAnimado(QPushButton):
     def __init__(self, nome, preco, incremento, metodo, icone, parent=None):
@@ -16,8 +14,7 @@ class BotaoAnimado(QPushButton):
         self.quantidade_comprada = 0
         self.metodo = metodo
         self.icone = icone
-        self.font_bold = QFont('Karla-Bold', 16, QFont.Bold)
-        self.font_regular = QFont('Karla', 16)
+        self.font_bold = QFont('Karla-Bold', 12, QFont.Bold)
         self.setIcon(QIcon(icone))
         self.setIconSize(QSize(32, 32))
         self.atualizar_texto()
@@ -47,6 +44,7 @@ class BotaoAnimado(QPushButton):
         self.setGraphicsEffect(sombra)
 
     def atualizar_texto(self):
+        self.setFont(self.font_bold)
         self.setText(f"({self.quantidade_comprada}) {self.nome}\nPreço: {self.preco} ouros\n+{self.incremento} ouro(s)/s")
 
     def animar(self):
@@ -102,9 +100,10 @@ class BotaoAnimado(QPushButton):
 
 
 class Shop(QWidget):
-    def __init__(self, metodo_exemplo, parent=None):
+    def __init__(self, parent=None, metodo_exemplo=None):
         super().__init__(parent)
         self.metodo_exemplo = metodo_exemplo
+        self.main_window = parent
 
         # Carregar fontes Karla
         QFontDatabase.addApplicationFont(os.path.join("resources", "fonts", "Karla", "static", "Karla-Regular.ttf"))
@@ -129,38 +128,8 @@ class Shop(QWidget):
         """)
         layout_loja.addWidget(self.titulo_loja)
 
-        # Área de rolagem para a lista de botões
-        area_rolagem = QScrollArea(self)
-        area_rolagem.setWidgetResizable(True)
-        area_rolagem.setStyleSheet("""
-            QScrollArea {
-                border: none;
-            }
-            QScrollBar:vertical {
-                background: transparent;
-                width: 8px;
-                margin-left: 10px;
-            }
-            QScrollBar:vertical:hover {
-                width: 12px;
-            }
-            QScrollBar::handle:vertical {
-                background: #134B70;
-                border-radius: 6px;
-            }
-            QScrollBar::sub-line:vertical, QScrollBar::add-line:vertical {
-                height: 0;
-                background: none;
-            }
-            QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-                background: none.
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none.
-            }
-        """)
-        conteudo_area_rolagem = QWidget()
-        area_rolagem.setWidget(conteudo_area_rolagem)
+        # Widget de conteúdo para a lista de botões
+        conteudo_area_rolagem = QWidget(self)
         layout_area_rolagem = QVBoxLayout(conteudo_area_rolagem)
         layout_area_rolagem.setContentsMargins(0, 0, 0, 0)
 
@@ -187,27 +156,30 @@ class Shop(QWidget):
             layout_area_rolagem.addWidget(botao)
 
         layout_area_rolagem.addStretch()
-        layout_loja.addWidget(area_rolagem)
+        layout_loja.addWidget(conteudo_area_rolagem)
+
+        # Atualizar estado dos botões ao iniciar
+        self.atualizar_estado_botoes()
 
     @pyqtSlot(QPushButton)
     def botao_lista_clicado(self, botao):
         botao.animar()
-        valor_atual = int(self.parent().info_panel.label_ouros.text().split(": ")[1])
+        valor_atual = int(self.main_window.info_panel.label_ouros.text().split(": ")[1])
         if valor_atual >= botao.preco:
             valor_atual -= botao.preco
-            self.parent().info_panel.label_ouros.setText(f"Ouro atual: {valor_atual}")
+            self.main_window.info_panel.label_ouros.setText(f"Ouro atual: {valor_atual}")
             botao.metodo()
-            self.parent().ouros_por_segundo += botao.incremento
-            self.parent().info_panel.label_ouros_por_segundo.setText(f"Rendimento: {self.parent().ouros_por_segundo} ouro/s")
+            self.main_window.ouros_por_segundo += botao.incremento
+            self.main_window.info_panel.label_ouros_por_segundo.setText(f"Rendimento: {self.main_window.ouros_por_segundo} ouro/s")
             botao.quantidade_comprada += 1
             botao.preco += botao.preco // 2
             botao.atualizar_texto()
-            self.parent().atualizar_estado_botoes()
-            if self.parent().sound:
-                self.parent().tocar_som('buy')
+            self.main_window.atualizar_estado_botoes()
+            if self.main_window.sound:
+                self.main_window.tocar_som('buy')
 
     def atualizar_estado_botoes(self):
-        valor_atual = int(self.parent().info_panel.label_ouros.text().split(": ")[1])
+        valor_atual = int(self.main_window.info_panel.label_ouros.text().split(": ")[1])
         for botao in self.botoes:
             if valor_atual >= botao.preco:
                 botao.set_bloqueado(False)

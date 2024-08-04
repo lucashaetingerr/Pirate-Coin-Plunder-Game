@@ -22,6 +22,9 @@ class MainWindow(QWidget):
         self.sound = True
         self.audio_players = []
         self.gift_icon = None
+
+        self.info_panel = InfoPanel(self)
+
         self.init_ui()
 
         self.spawn_timer = QTimer(self)
@@ -35,16 +38,17 @@ class MainWindow(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("[ALPHA] Pirate Coin Plunder")
-        self.setGeometry(100, 100, 800, 600)
-        self.setMinimumSize(800, 600)
-
-        # Centralizar a janela na tela
-        self.center_window()
+        self.setFixedSize(1024, 768)
 
         layout_principal = QHBoxLayout(self)
 
-        self.shop = Shop(self.metodo_exemplo, self)
-        layout_principal.addWidget(self.shop, 1)
+        # Criação da área de rolagem para a loja
+        scroll_area_shop = QScrollArea(self)
+        scroll_area_shop.setWidgetResizable(True)
+        scroll_area_shop.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.shop = Shop(self, self.metodo_exemplo)
+        scroll_area_shop.setWidget(self.shop)
+        layout_principal.addWidget(scroll_area_shop, 1)
 
         divisoria_direita_loja = QFrame(self)
         divisoria_direita_loja.setFrameShape(QFrame.VLine)
@@ -52,7 +56,6 @@ class MainWindow(QWidget):
         divisoria_direita_loja.setStyleSheet("color: #d9d9d9;")
         layout_principal.addWidget(divisoria_direita_loja)
 
-        self.info_panel = InfoPanel(self)
         layout_principal.addWidget(self.info_panel, 2)
 
         divisoria_esquerda_icones = QFrame(self)
@@ -60,13 +63,6 @@ class MainWindow(QWidget):
         divisoria_esquerda_icones.setFrameShadow(QFrame.Sunken)
         divisoria_esquerda_icones.setStyleSheet("color: #d9d9d9;")
         layout_principal.addWidget(divisoria_esquerda_icones)
-
-        # self.botao_configuracoes = QPushButton(self)
-        # self.botao_configuracoes.setIcon(QIcon(os.path.join("resources", "icons", "settings.svg")))
-        # self.botao_configuracoes.setIconSize(self.botao_configuracoes.size())
-        # self.botao_configuracoes.setStyleSheet("border: none;")
-        # self.botao_configuracoes.setFixedSize(30, 30)
-        # self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
 
         self.botao_som = QPushButton(self)
         self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "sound.svg")))
@@ -76,7 +72,6 @@ class MainWindow(QWidget):
         self.botao_som.clicked.connect(self.toggle_som)
 
         layout_icones = QVBoxLayout()
-        # layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignTop)
         layout_icones.addWidget(self.botao_som, alignment=Qt.AlignTop)
         layout_icones.addStretch()
 
@@ -115,11 +110,6 @@ class MainWindow(QWidget):
 
     def atualizar_estado_botoes(self):
         self.shop.atualizar_estado_botoes()
-
-    def mostrar_janela_configuracoes(self):
-        janela_configuracoes = ConfigDialog()
-        janela_configuracoes.setWindowModality(Qt.ApplicationModal)
-        janela_configuracoes.exec_()
 
     def toggle_som(self):
         self.sound = not self.sound
