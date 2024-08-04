@@ -1,6 +1,5 @@
 import sys
 import os
-import random
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton, QGraphicsDropShadowEffect)
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEasingCurve, pyqtSlot, QSize
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
@@ -144,7 +143,13 @@ class Shop(QWidget):
             {"nome": "Mapa do Pirata", "preco": 800, "incremento": 80, "icone": os.path.join("resources", "icons", "store_icons", "pirate-map.svg")},
             {"nome": "Sabre", "preco": 1600, "incremento": 160, "icone": os.path.join("resources", "icons", "store_icons", "saber.svg")},
             {"nome": "Pérola Negra", "preco": 3200, "incremento": 320, "icone": os.path.join("resources", "icons", "store_icons", "pearl.svg")},
-            {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640, "icone": os.path.join("resources", "icons", "store_icons", "legendary-treasure.svg")}
+            {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640, "icone": os.path.join("resources", "icons", "store_icons", "legendary-treasure.svg")},
+            # Novos itens em português e únicos
+            {"nome": "Navio Fantasma", "preco": 12800, "incremento": 1280, "icone": os.path.join("resources", "icons", "store_icons", "ghost-ship.svg")},
+            {"nome": "Rumo Dourado", "preco": 25600, "incremento": 2560, "icone": os.path.join("resources", "icons", "store_icons", "golden-compass.svg")},
+            {"nome": "Kraken", "preco": 51200, "incremento": 5120, "icone": os.path.join("resources", "icons", "store_icons", "kraken.svg")},
+            {"nome": "Bandeira Pirata", "preco": 102400, "incremento": 10240, "icone": os.path.join("resources", "icons", "store_icons", "pirate-flag.svg")},
+            {"nome": "Rum Encantado", "preco": 204800, "incremento": 20480, "icone": os.path.join("resources", "icons", "store_icons", "magic-rum.svg")}
         ]
 
         # Adicionar botões à lista
