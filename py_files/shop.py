@@ -145,11 +145,11 @@ class Shop(QWidget):
             {"nome": "Pérola Negra", "preco": 3200, "incremento": 320, "icone": os.path.join("resources", "icons", "store_icons", "pearl.svg")},
             {"nome": "Tesouro Lendário", "preco": 6400, "incremento": 640, "icone": os.path.join("resources", "icons", "store_icons", "legendary-treasure.svg")},
             # Novos itens em português e únicos
-            {"nome": "Navio Fantasma", "preco": 12800, "incremento": 1280, "icone": os.path.join("resources", "icons", "store_icons", "ghost-ship.svg")},
-            {"nome": "Rumo Dourado", "preco": 25600, "incremento": 2560, "icone": os.path.join("resources", "icons", "store_icons", "golden-compass.svg")},
+            {"nome": "Fantasma", "preco": 12800, "incremento": 1280, "icone": os.path.join("resources", "icons", "store_icons", "ghost.svg")},
+            {"nome": "Pirata Vigarista", "preco": 25600, "incremento": 2560, "icone": os.path.join("resources", "icons", "store_icons", "pirate-vigarista.svg")},
             {"nome": "Kraken", "preco": 51200, "incremento": 5120, "icone": os.path.join("resources", "icons", "store_icons", "kraken.svg")},
-            {"nome": "Bandeira Pirata", "preco": 102400, "incremento": 10240, "icone": os.path.join("resources", "icons", "store_icons", "pirate-flag.svg")},
-            {"nome": "Rum Encantado", "preco": 204800, "incremento": 20480, "icone": os.path.join("resources", "icons", "store_icons", "magic-rum.svg")}
+            {"nome": "Bandeira Pirata", "preco": 102400, "incremento": 10240, "icone": os.path.join("resources", "icons", "store_icons", "flag.svg")},
+            {"nome": "Rum Encantado", "preco": 204800, "incremento": 20480, "icone": os.path.join("resources", "icons", "store_icons", "rum.svg")}
         ]
 
         # Adicionar botões à lista

@@ -3,10 +3,10 @@ import os
 import random
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
-from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize, QElapsedTimer
+from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
 from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-
+from PyQt5.QtCore import QElapsedTimer
 
 class InfoPanel(QWidget):
     def __init__(self, parent=None):
@@ -34,11 +34,19 @@ class InfoPanel(QWidget):
         self.label_informacoes.setStyleSheet("color: black;")
         layout_frame_informacoes.addWidget(self.label_informacoes)
 
-        self.label_tempo = QLabel("Tempo: 00:00:00", self.frame_informacoes)
-        self.label_tempo.setAlignment(Qt.AlignTop | Qt.AlignCenter)
-        self.label_tempo.setFont(QFont('Karla', 16))
-        self.label_tempo.setStyleSheet("color: black;")
-        layout_frame_informacoes.addWidget(self.label_tempo)
+        # Label para o tempo de sessão atual
+        self.label_session_time = QLabel("Tempo da Sessão: 00:00:00", self.frame_informacoes)
+        self.label_session_time.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+        self.label_session_time.setFont(QFont('Karla', 16))
+        self.label_session_time.setStyleSheet("color: black;")
+        layout_frame_informacoes.addWidget(self.label_session_time)
+
+        # Label para o tempo total
+        self.label_total_time = QLabel("Tempo Total: 00:00:00", self.frame_informacoes)
+        self.label_total_time.setAlignment(Qt.AlignTop | Qt.AlignCenter)
+        self.label_total_time.setFont(QFont('Karla', 16))
+        self.label_total_time.setStyleSheet("color: black;")
+        layout_frame_informacoes.addWidget(self.label_total_time)
 
         layout_jogo.addWidget(self.frame_informacoes)
 
@@ -115,7 +123,7 @@ class InfoPanel(QWidget):
     def update_elapsed_time(self):
         elapsed_msec = self.elapsed_timer.elapsed()
         elapsed_sec = elapsed_msec // 1000
-        self.label_tempo.setText(f"Tempo: {QTime(0, 0, 0).addSecs(elapsed_sec).toString('hh:mm:ss')}")
+        self.label_session_time.setText(f"Tempo da Sessão: {QTime(0, 0, 0).addSecs(elapsed_sec).toString('hh:mm:ss')}")
 
     @pyqtSlot()
     def incrementar_ouros(self):
