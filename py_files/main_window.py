@@ -4,7 +4,7 @@ import random
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QScrollArea, QPushButton, QDialog, QCheckBox, QDialogButtonBox, QSpacerItem, QSizePolicy, QGraphicsDropShadowEffect, QFrame)
 from PyQt5.QtCore import Qt, QPropertyAnimation, QRect, QEvent, QEasingCurve, pyqtSlot, QTimer, QUrl, QTime, QSize
-from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor
+from PyQt5.QtGui import QFontDatabase, QFont, QIcon, QColor, QScreen
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 
 from py_files.shop import Shop
@@ -34,9 +34,12 @@ class MainWindow(QWidget):
         self.elapsed_timer.start(1000)
 
     def init_ui(self):
-        self.setWindowTitle("Pirate Coin Plunder")
+        self.setWindowTitle("[ALPHA] Pirate Coin Plunder")
         self.setGeometry(100, 100, 800, 600)
         self.setMinimumSize(800, 600)
+
+        # Centralizar a janela na tela
+        self.center_window()
 
         layout_principal = QHBoxLayout(self)
 
@@ -58,12 +61,12 @@ class MainWindow(QWidget):
         divisoria_esquerda_icones.setStyleSheet("color: #d9d9d9;")
         layout_principal.addWidget(divisoria_esquerda_icones)
 
-        self.botao_configuracoes = QPushButton(self)
-        self.botao_configuracoes.setIcon(QIcon(os.path.join("resources", "icons", "settings.svg")))
-        self.botao_configuracoes.setIconSize(self.botao_configuracoes.size())
-        self.botao_configuracoes.setStyleSheet("border: none;")
-        self.botao_configuracoes.setFixedSize(30, 30)
-        self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
+        # self.botao_configuracoes = QPushButton(self)
+        # self.botao_configuracoes.setIcon(QIcon(os.path.join("resources", "icons", "settings.svg")))
+        # self.botao_configuracoes.setIconSize(self.botao_configuracoes.size())
+        # self.botao_configuracoes.setStyleSheet("border: none;")
+        # self.botao_configuracoes.setFixedSize(30, 30)
+        # self.botao_configuracoes.clicked.connect(self.mostrar_janela_configuracoes)
 
         self.botao_som = QPushButton(self)
         self.botao_som.setIcon(QIcon(os.path.join("resources", "icons", "sound.svg")))
@@ -73,7 +76,7 @@ class MainWindow(QWidget):
         self.botao_som.clicked.connect(self.toggle_som)
 
         layout_icones = QVBoxLayout()
-        layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignTop)
+        # layout_icones.addWidget(self.botao_configuracoes, alignment=Qt.AlignTop)
         layout_icones.addWidget(self.botao_som, alignment=Qt.AlignTop)
         layout_icones.addStretch()
 
@@ -88,6 +91,12 @@ class MainWindow(QWidget):
         self.timer.start(1000)
 
         self.ouros_por_segundo = 0
+
+    def center_window(self):
+        screen = QScreen.availableGeometry(QApplication.primaryScreen())
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.Resize:
@@ -135,7 +144,7 @@ class MainWindow(QWidget):
             player.deleteLater()
 
     def metodo_exemplo(self):
-        print("Item comprado!")
+        pass
 
     def spawn_gift_icon(self):
         if self.gift_icon is not None:

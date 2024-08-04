@@ -168,7 +168,7 @@ class Shop(QWidget):
         self.botoes_dados = [
             {"nome": "Navio Pirata", "preco": 10, "incremento": 1, "icone": os.path.join("resources", "icons", "store_icons", "pirate-ship.svg")},
             {"nome": "Baú de Tesouro", "preco": 25, "incremento": 3, "icone": os.path.join("resources", "icons", "store_icons", "treasure-chest.svg")},
-            {"nome": "Tripulação de Bucaneiros", "preco": 50, "incremento": 5, "icone": os.path.join("resources", "icons", "store_icons", "pirate-buccaneer.svg")},
+            {"nome": "Tripulação", "preco": 50, "incremento": 5, "icone": os.path.join("resources", "icons", "store_icons", "pirate-buccaneer.svg")},
             {"nome": "Chapéu do Capitão", "preco": 100, "incremento": 10, "icone": os.path.join("resources", "icons", "store_icons", "pirate-hat.svg")},
             {"nome": "Papagaio", "preco": 200, "incremento": 20, "icone": os.path.join("resources", "icons", "store_icons", "parrot.svg")},
             {"nome": "Canhão", "preco": 400, "incremento": 40, "icone": os.path.join("resources", "icons", "store_icons", "cannon.svg")},
